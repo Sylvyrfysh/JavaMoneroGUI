@@ -10,6 +10,8 @@ import com.sylvyrfysh.monerowallet.renderers.BeginRenderer;
 import com.sylvyrfysh.monerowallet.renderers.Renderer;
 
 import glm_.vec4.Vec4;
+import imgui.Font;
+import imgui.FontConfig;
 import imgui.IO;
 import imgui.ImGui;
 import imgui.impl.LwjglGL3;
