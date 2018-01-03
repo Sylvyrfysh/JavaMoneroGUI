@@ -35,6 +35,11 @@ public class MoneroWalletMain {
 		// Setup ImGui binding
 		lwjglGL3.init(window, true);
 		
+		FontConfig fc=new FontConfig();
+		
+		Font f=io.getFonts().addFontFromFileTTF("extraFonts/DroidSans.ttf", 16.0f, fc, new int[] {});
+		io.setFontDefault(f);
+		
 		while (window.getOpen())
 			loop();
 
