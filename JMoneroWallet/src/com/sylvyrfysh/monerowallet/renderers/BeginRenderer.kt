@@ -24,13 +24,15 @@ class BeginRenderer : Renderer {
 	override fun renderState() : WState{
 		return WState.FIRST_RUN
 	}
-	
-	override fun render(imgui : ImGui, io : IO){
-		with(imgui){
-			setNextWindowPos(Vec2(0,0), Cond.FirstUseEver, Vec2());
-			setNextWindowSize(Vec2(1280,720), Cond.FirstUseEver);
-			if(begin("Setup", windowOpen, WindowFlags.NoMove.i or WindowFlags.NoResize.i or WindowFlags.NoCollapse.i)) {
-				
+
+	override fun render(imgui: ImGui?, io: IO?) {
+		if(imgui == null)
+			return
+		with(imgui) {
+			setNextWindowPos(Vec2(0, 0), Cond.FirstUseEver, Vec2());
+			setNextWindowSize(Vec2(1280, 720), Cond.FirstUseEver);
+			if (begin("Setup", windowOpen, WindowFlags.NoMove.i or WindowFlags.NoResize.i or WindowFlags.NoCollapse.i)) {
+
 				text("Node Type:")
 				radioButton("Local Node", selectedNode, 0);
 				if(isItemHovered(0))
