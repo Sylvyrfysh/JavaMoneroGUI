@@ -1,5 +1,11 @@
 package com.sylvyrfysh.monerowallet;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,6 +20,8 @@ public class WalletHandler {
 	private static WalletHandlerStatus status = WalletHandlerStatus.UNCONNECTED;
 	private static String statusMessage = "";
 	public static String TOOLS_VERSION = "v0_11_1_0";
+	private static boolean haveValidNode = false;
+	private static String nodeAddress;
 
 	public static void tryConnect(String address, String port) {
 		int portN = 0;
@@ -28,9 +36,29 @@ public class WalletHandler {
 		}
 		statusMessage = "Connecting...";
 
-		ProcessBuilder pb = new ProcessBuilder(String.format("res/%s/monerod.exe", TOOLS_VERSION));
+		try {
+			HttpURLConnection s = (HttpURLConnection) new URL(String.format("http://%s:%d/getheight", address, portN))
+					.openConnection();
+			s.addRequestProperty("Content-Type", "application/json");
+			if (s.getResponseCode() != 200) {
+				throw new IOException(String.format("%d", s.getResponseCode()));
+			}
+			logger.trace("node {}:{} ({}) is valid", address, portN,
+					InetAddress.getByName(s.getURL().getHost()).getHostAddress());
+			statusMessage = "Valid Node!";
+			haveValidNode = true;
+			nodeAddress = String.format("http://%s:%d/", address, portN);
+		} catch (MalformedURLException e) {
+			updateErrorStatus("Address %s:%d is not a valid address! %s", e, address, portN, e.getMessage());
+			e.printStackTrace();
+		} catch (IOException e) {
+			updateErrorStatus("Could not connect to address %s:%d! %s", e, address, portN, e.getMessage());
+			e.printStackTrace();
+		}
+	}
 
-		// TODO: Daemon and all that
+	public static void commitNode() {
+		//Config.setAttribute("wallet.node_address", nodeAddress);
 	}
 
 	public static String getStatusMessage() {
@@ -72,5 +100,14 @@ public class WalletHandler {
 		statusMessage = String.format(format, strs);
 		logger.error(statusMessage);
 		logger.error(err);
+	}
+
+	public static boolean hasValidNode() {
+		return haveValidNode;
+	}
+
+	public static void nodeChanged() {
+		WalletHandler.haveValidNode = false;
+		statusMessage = "";
 	}
 }

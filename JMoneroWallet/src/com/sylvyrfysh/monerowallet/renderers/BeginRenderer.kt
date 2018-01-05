@@ -29,7 +29,7 @@ class NodePickRenderer : Renderer {
 	}
 
 	override fun render(imgui: ImGui?, io: IO?) {
-		if(imgui == null)
+		if (imgui == null)
 			return
 		with(imgui) {
 			setNextWindowPos(Vec2(0, 0), Cond.FirstUseEver, Vec2());
@@ -53,7 +53,9 @@ class NodePickRenderer : Renderer {
 					text("Remote Node Port")
 					if (inputText("", remoteNodePort, InputTextFlags.EnterReturnsTrue.i) or button("Test Connection")) {
 						WalletHandler.clearErrorStatus();
-						WalletHandler.tryConnect(ImGuiUtils.imguiToStr(remoteNodeAddress), ImGuiUtils.imguiToStr(remoteNodePort));
+						var tcThread = Thread(Runnable() { WalletHandler.tryConnect(ImGuiUtils.imguiToStr(remoteNodeAddress), ImGuiUtils.imguiToStr(remoteNodePort)) });
+						tcThread.name = "TestConn"
+						tcThread.start()
 						connectionTested = true
 					}
 					if (connectionTested) {
@@ -64,6 +66,12 @@ class NodePickRenderer : Renderer {
 							CONNECTED -> Vec4(0, 1, 0, 1)
 							else -> Vec4(1)
 						}, WalletHandler.getStatusMessage())
+					}
+					if (WalletHandler.hasValidNode()) {
+						if (button("Continue")) {
+							WalletHandler.commitNode()
+							MoneroWalletMain.renderState = WState.WALLET_SETUP
+						}
 					}
 				}
 

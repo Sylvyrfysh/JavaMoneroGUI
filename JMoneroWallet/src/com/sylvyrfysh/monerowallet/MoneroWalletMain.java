@@ -20,6 +20,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.sylvyrfysh.monerowallet.renderers.NodePickRenderer;
 import com.sylvyrfysh.monerowallet.renderers.Renderer;
+import com.sylvyrfysh.monerowallet.renderers.WalletSetupRenderer;
 
 import glm_.vec4.Vec4;
 import imgui.Font;
@@ -133,7 +134,7 @@ public class MoneroWalletMain {
 	private LwjglGL3 lwjglGL3 = LwjglGL3.INSTANCE;
 	private static ImGui imgui = ImGui.INSTANCE;
 	private IO io = IO.INSTANCE;
-	private WState renderState = WState.FIRST_RUN;
+	public static WState renderState = WState.SELECT_NODE;
 
 	public void run() {
 
@@ -170,7 +171,8 @@ public class MoneroWalletMain {
 
 		renderers = new ArrayList<>();
 		renderers.add(new NodePickRenderer());
-
+		renderers.add(new WalletSetupRenderer());
+		
 		GL.createCapabilities();
 	}
 
