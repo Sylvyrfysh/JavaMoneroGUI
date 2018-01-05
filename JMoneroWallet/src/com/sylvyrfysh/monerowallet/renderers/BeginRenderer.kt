@@ -1,11 +1,12 @@
 package com.sylvyrfysh.monerowallet.renderers
 
 import com.sylvyrfysh.monerowallet.*
-import com.sylvyrfysh.monerowallet.Network.NetworkStatus.*
+import com.sylvyrfysh.monerowallet.WalletHandler.WalletHandlerStatus.*
 import imgui.*
 
 import glm_.vec2.Vec2
 import glm_.vec4.Vec4
+import org.apache.logging.log4j.*
 
 class BeginRenderer : Renderer {
 	val windowOpen = booleanArrayOf(true)
@@ -15,14 +16,16 @@ class BeginRenderer : Renderer {
 	private var remoteNodeAddress = CharArray(256)
 	private var remoteNodePort = CharArray(256)
 	private var connectionTested = false
-	
-	init{
-		System.arraycopy("node.moneroworld.com".toCharArray(),0,remoteNodeAddress,0,"node.moneroworld.com".toCharArray().size)
-		System.arraycopy("18089".toCharArray(),0,remoteNodePort,0,"18089".toCharArray().size)
+
+	private val logger = LogManager.getLogger()
+
+	init {
+		System.arraycopy("node.moneroworld.com".toCharArray(), 0, remoteNodeAddress, 0, "node.moneroworld.com".toCharArray().size)
+		System.arraycopy("18089".toCharArray(), 0, remoteNodePort, 0, "18089".toCharArray().size)
 	}
-	
-	override fun renderState() : WState{
-		return WState.FIRST_RUN
+
+	override fun renderState(): WState {
+		return WState.SELECT_NODE
 	}
 
 	override fun render(imgui: ImGui?, io: IO?) {
@@ -35,35 +38,35 @@ class BeginRenderer : Renderer {
 
 				text("Node Type:")
 				radioButton("Local Node", selectedNode, 0);
-				if(isItemHovered(0))
+				if (isItemHovered(0))
 					setTooltip("Running a local node will contribute to the decentralization of the network, but takes up a lot of space on your computer.");
 				sameLine(0);
 				radioButton("Remote Node", selectedNode, 1);
-				if(isItemHovered(0))
+				if (isItemHovered(0))
 					setTooltip("Using a remote node will have your computer connect to it and download necessary information for your wallet. This is less secure.");
-				textColored(Vec4(0,1,0,1),"Node type and address can be changed later in settings.");
-				
+				textColored(Vec4(0, 1, 0, 1), "Node type and address can be changed later in settings.");
+
 				separator()
-				if(selectedNode[0] == remoteNode){
+				if (selectedNode[0] == remoteNode) {
 					text("Remote Node Address")
-					inputText("",remoteNodeAddress)
+					inputText("", remoteNodeAddress)
 					text("Remote Node Port")
-					inputText("",remoteNodePort)
-					if(button("Test Connection")){
-						Network.tryConnect(remoteNodeAddress,remoteNodePort);
+					if (inputText("", remoteNodePort, InputTextFlags.EnterReturnsTrue.i) or button("Test Connection")) {
+						WalletHandler.clearErrorStatus();
+						WalletHandler.tryConnect(ImGuiUtils.imguiToStr(remoteNodeAddress), ImGuiUtils.imguiToStr(remoteNodePort));
 						connectionTested = true
 					}
-					if(connectionTested){
+					if (connectionTested) {
 						sameLine(0)
-						textColored(when(Network.getStatus()){
-							ERROR -> Vec4(1,0,0,1)
+						textColored(when (WalletHandler.getStatus()) {
+							ERROR -> Vec4(1, 0, 0, 1)
 							UNCONNECTED -> Vec4(.8)
-							CONNECTED -> Vec4(0,1,0,1)
+							CONNECTED -> Vec4(0, 1, 0, 1)
 							else -> Vec4(1)
-						},Network.getStatusMessage())
+						}, WalletHandler.getStatusMessage())
 					}
 				}
-				
+
 				end();
 			}
 		}
