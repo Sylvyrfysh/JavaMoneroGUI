@@ -8,7 +8,7 @@ import glm_.vec2.Vec2
 import glm_.vec4.Vec4
 import org.apache.logging.log4j.*
 
-class BeginRenderer : Renderer {
+class NodePickRenderer : Renderer {
 	val windowOpen = booleanArrayOf(true)
 	val localNode = 0
 	val remoteNode = 1
