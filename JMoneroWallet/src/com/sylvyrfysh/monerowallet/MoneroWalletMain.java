@@ -133,6 +133,7 @@ public class MoneroWalletMain {
 	private LwjglGL3 lwjglGL3 = LwjglGL3.INSTANCE;
 	private static ImGui imgui = ImGui.INSTANCE;
 	private IO io = IO.INSTANCE;
+	private WState renderState = WState.FIRST_RUN;
 
 	public void run() {
 
@@ -182,7 +183,10 @@ public class MoneroWalletMain {
 		gln.GlnKt.glClearColor(new Vec4(.2));
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 
-		renderers.get(0).render(imgui, io);
+		for(Renderer r:renderers) {
+			if(r.renderState() == renderState )
+				r.render(imgui, io);
+		}
 
 		imgui.render();
 		window.swapBuffers();
