@@ -20,6 +20,12 @@ class NodePickRenderer : Renderer {
 	private val logger = LogManager.getLogger()
 
 	init {
+
+		if (!Config.getJSON().isNull("wallet.node_address")) {
+			logger.info("Wallet node address has been set, moving to wallet generation")
+			MoneroWalletMain.renderState = WState.WALLET_SETUP
+		}
+
 		System.arraycopy("node.moneroworld.com".toCharArray(), 0, remoteNodeAddress, 0, "node.moneroworld.com".toCharArray().size)
 		System.arraycopy("18089".toCharArray(), 0, remoteNodePort, 0, "18089".toCharArray().size)
 	}

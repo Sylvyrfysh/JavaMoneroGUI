@@ -55,10 +55,12 @@ public class WalletHandler {
 			updateErrorStatus("Could not connect to address %s:%d! %s", e, address, portN, e.getMessage());
 			e.printStackTrace();
 		}
+		logger.info(sb.toString());
 	}
 
 	public static void commitNode() {
-		//Config.setAttribute("wallet.node_address", nodeAddress);
+		Config.getJSON().put("wallet.node_address", nodeAddress);
+		Config.writeConfig();
 	}
 
 	public static String getStatusMessage() {
