@@ -1,13 +1,24 @@
 package com.sylvyrfysh.monerowallet;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import wallet.MoneroWalletRpc;
 
 public class WalletHandler {
 
@@ -22,6 +33,8 @@ public class WalletHandler {
 	public static String TOOLS_VERSION = "v0_11_1_0";
 	private static boolean haveValidNode = false;
 	private static String nodeAddress;
+	private static int RPC_PORT = 22665;
+	private static RPCWrapper rpc;
 
 	public static void tryConnect(String address, String port) {
 		int portN = 0;
@@ -55,9 +68,56 @@ public class WalletHandler {
 			updateErrorStatus("Could not connect to address %s:%d! %s", e, address, portN, e.getMessage());
 			e.printStackTrace();
 		}
-		logger.info(sb.toString());
 	}
 
+	public static void openRPC(String wallet, String passcode) {
+		Thread rpcThread = new Thread(() -> {
+			logger.trace("Node is {}",Config.getJSON().get("wallet.node_address"));
+			ProcessBuilder pf=new ProcessBuilder(String.format("res/%s/monero-wallet-rpc.exe",TOOLS_VERSION),String.format("--wallet-file=%s",wallet),String.format("--daemon-address=%s",Config.getJSON().get("wallet.node_address")),String.format("--rpc-bind-port=%d",RPC_PORT),"--disable-rpc-login");
+			pf.redirectErrorStream(true);
+			Process p = null;
+			try {
+				p=pf.start();
+				BufferedReader bis = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				String line = "";
+				while((line = bis.readLine())!=null) {
+					logger.trace("RPCth: {}",line);
+					if(line.contains("Loading wallet...")) {
+						p.getOutputStream().write(passcode.getBytes());
+						p.getOutputStream().write('\n');
+						p.getOutputStream().flush();
+					}else if(line.contains("Starting wallet rpc server")) {
+						Thread startInternalSocket = new Thread(() -> {
+							logger.info("Waiting for RPC start");
+							try {
+								Thread.sleep(2500);
+							} catch (InterruptedException e) {}
+							try {
+								/*String file = String.format("monero-wallet-rpc.%d.login", RPC_PORT);
+								Path f = Paths.get(new File(file).toURI());
+								String upp = new String(Files.readAllBytes(f));
+								String[] pair = upp.split(":");*/
+								URI s = new URL(String.format("http://127.0.0.1:%d", RPC_PORT)).toURI();
+								rpc = new RPCWrapper(new MoneroWalletRpc(s.getHost(),s.getPort(),"",""/*,pair[0],pair[1]*/));
+								logger.trace("Height is {}",RPCWrapper.getHeight());
+							} catch (URISyntaxException | IOException e) {
+								logger.error(e);
+							}
+							logger.trace("RPC Started");
+						});
+						startInternalSocket.setName("Start RPC");
+						startInternalSocket.start();
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		rpcThread.setName("RPC Thread");
+		rpcThread.start();
+		logger.info("RPC Thread started");
+	}
+	
 	public static void commitNode() {
 		Config.getJSON().put("wallet.node_address", nodeAddress);
 		Config.writeConfig();
@@ -111,5 +171,9 @@ public class WalletHandler {
 	public static void nodeChanged() {
 		WalletHandler.haveValidNode = false;
 		statusMessage = "";
+	}
+
+	public static RPCWrapper getRpc() {
+		return rpc;
 	}
 }

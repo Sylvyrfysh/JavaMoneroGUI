@@ -20,6 +20,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.sylvyrfysh.monerowallet.renderers.NodePickRenderer;
 import com.sylvyrfysh.monerowallet.renderers.Renderer;
+import com.sylvyrfysh.monerowallet.renderers.WalletOpenRenderer;
 import com.sylvyrfysh.monerowallet.renderers.WalletSetupRenderer;
 
 import glm_.vec4.Vec4;
@@ -172,6 +173,7 @@ public class MoneroWalletMain {
 		renderers = new ArrayList<>();
 		renderers.add(new NodePickRenderer());
 		renderers.add(new WalletSetupRenderer());
+		renderers.add(new WalletOpenRenderer());
 		
 		GL.createCapabilities();
 	}
