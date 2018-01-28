@@ -27,7 +27,7 @@ public class RPCWrapper {
 		return balance.getObj();
 	}
 
-	public BigInteger getUnlockedBalance() {
+	public static BigInteger getUnlockedBalance() {
 		if (!unlockedBalance.isValid())
 			unlockedBalance = new TimedObject<>(rpc.getBalance(), 5);
 		return unlockedBalance.getObj();
@@ -39,13 +39,13 @@ public class RPCWrapper {
 		return height.getObj();
 	}
 
-	public MoneroAddress getStandardAddress() {
+	public static MoneroAddress getStandardAddress() {
 		if (!stdAddress.isValid())
 			stdAddress = new TimedObject<>(rpc.getStandardAddress(), 3600);
 		return stdAddress.getObj();
 	}
 
-	public List<MoneroTransaction> getAllTransactions() {
+	public static List<MoneroTransaction> getAllTransactions() {
 		if (!transactions.isValid())
 			transactions = new TimedObject<>(rpc.getAllTransactions(), 5);
 		return transactions.getObj();
