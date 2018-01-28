@@ -148,7 +148,7 @@ public class MoneroWalletMain {
 		Font f = io.getFonts().addFontFromFileTTF("extraFonts/DroidSans.ttf", 16.0f, fc, new int[] {});
 		io.setFontDefault(f);
 
-		while (window.getOpen())
+		while (window.isOpen())
 			loop();
 
 		lwjglGL3.shutdown();
