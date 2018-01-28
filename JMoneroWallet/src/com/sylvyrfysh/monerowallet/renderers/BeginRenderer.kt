@@ -26,8 +26,8 @@ class NodePickRenderer : Renderer {
 			MoneroWalletMain.renderState = WState.WALLET_SETUP
 		}
 
-		System.arraycopy("node.moneroworld.com".toCharArray(), 0, remoteNodeAddress, 0, "node.moneroworld.com".toCharArray().size)
-		System.arraycopy("18089".toCharArray(), 0, remoteNodePort, 0, "18089".toCharArray().size)
+		System.arraycopy("node.viaxmr.com".toCharArray(), 0, remoteNodeAddress, 0, "node.viaxmr.com".toCharArray().size)
+		System.arraycopy("18081".toCharArray(), 0, remoteNodePort, 0, "18081".toCharArray().size)
 	}
 
 	override fun renderState(): WState {
