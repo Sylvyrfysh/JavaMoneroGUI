@@ -22,3 +22,6 @@
 hs_err_pid*
 JMoneroWallet/imgui.ini
 JMoneroWallet/res/v0_11_1_0/*
+*.login
+*.keys
+*.address.txt
