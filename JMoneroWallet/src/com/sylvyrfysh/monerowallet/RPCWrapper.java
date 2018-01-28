@@ -2,11 +2,8 @@ package com.sylvyrfysh.monerowallet;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
-
 import wallet.MoneroAddress;
 import wallet.MoneroTransaction;
-import wallet.MoneroUtils;
 import wallet.MoneroWalletRpc;
 
 public class RPCWrapper {
